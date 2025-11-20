@@ -263,7 +263,7 @@ fun merge(nums1: IntArray, m: Int, nums2: IntArray, n: Int): Unit {
         arrP++
     }
 
-    for(i in 0..m+n -1 ){
+    for (i in 0..m + n - 1) {
         nums1[i] = array[i]
     }
 }
@@ -275,6 +275,35 @@ fun merge2(nums1: IntArray, m: Int, nums2: IntArray, n: Int): Unit {
 
 }
 
+/**
+ * 26. 删除有序数组中的重复项
+ * 非严格递增排列 的数组 nums ，请你 原地 删除重复出现的元素，使每个元素 只出现一次 ，
+ * 返回删除后数组的新长度。元素的 相对顺序 应该保持 一致 。然后返回 nums 中唯一元素的个数。
+ * 输入：nums = [0,0,1,1,1,2,2,3,3,4]
+ * 输出：5, nums = [0,1,2,3,4,_,_,_,_,_]
+ *
+ * 解题
+ * 快慢指针，需要快指针遇到不相同的，就给慢指针的位置赋值，慢指针前进
+ */
+fun removeDuplicates(nums: IntArray): Int {
+    var index = 1
+    for (i in 1..<nums.size) {
+        if (nums[i] != nums[i - 1]) nums[index++] = nums[i]
+    }
+    return index
+}
+
+/**
+ * 136. 只出现一次的数字
+ * 给你一个 非空 整数数组 nums ，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+ * 输入：nums = [4,1,2,1,2]
+ * 输出：4
+ *
+ *解题
+ */
+fun singleNumber(nums: IntArray): Int {
+
+}
 
 
 ///**
