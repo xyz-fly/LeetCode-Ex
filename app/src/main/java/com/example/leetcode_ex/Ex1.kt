@@ -2,6 +2,8 @@ package com.example.leetcode_ex
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.graphics.rotationMatrix
+import androidx.core.os.trace
 import java.util.Arrays
 import java.util.PriorityQueue
 
@@ -10,8 +12,19 @@ fun main(args: Array<String>) {
 //    twoSum(intArrayOf(2, 7, 11, 15), 9)
 //    threeSum(intArrayOf(-1, 0, 1, 2, -1, -4))
 //    fourSum(intArrayOf(2, 1, 0, -1), 2)
+//    merge(intArrayOf(1), 1, intArrayOf(), 0)
+//
+//    longestCommonPrefix(arrayOf("flower", "flow", "flight"))
 
-    merge(intArrayOf(1), 1, intArrayOf(), 0)
+//    removeElement(intArrayOf(3, 2, 2, 3), 3)
+
+//    search(intArrayOf(3, 1), 1)
+
+//    findMaxAverage(intArrayOf(1, 12, -5, -6, 50, 3), 4)
+
+//    subarraySum(intArrayOf(1, 1, 1), 2)
+//    subarraySum(intArrayOf(1, 2, 3), 3)
+    sortColors(intArrayOf(2, 0, 2, 1, 1, 0))
 }
 
 /**
@@ -133,6 +146,111 @@ fun fourSum(nums: IntArray, target: Int): List<List<Int>> {
 }
 
 /**
+ * 14. 最长公共前缀
+ * 输入：strs = ["flower","flow","flight"]
+ * 输出："fl"
+ *
+ */
+fun longestCommonPrefix(strs: Array<String>): String {
+    if (strs.size == 0) return ""
+
+    var target = strs[0]
+    for (i in 1..strs.size - 1) {
+        var index = -1
+        val str = strs[i]
+        val length = minOf(str.length, target.length)
+        for (j in 0..length - 1) {
+            if (target.get(j) == str.get(j)) {
+                index = j
+            } else break
+        }
+        if (index == -1) return ""
+        target = target.substring(0, index + 1) // +1
+    }
+    return target
+}
+
+/**
+ * 27. 移除元素
+ * 给你一个数组 nums 和一个值 val，你需要 原地 移除所有数值等于 val 的元素。
+ * 元素的顺序可能发生改变。然后返回 nums 中与 val 不同的元素的数量。
+ *
+ * 输入：nums = [0,1,2,2,3,0,4,2], val = 2
+ * 输出：5, nums = [0,1,4,0,3,_,_,_]
+ *
+ * 解题
+ * 慢指针的含义是该位置不能是目标，快指针走的时候，遇到不是目标就将结果赋值给慢指针的位置
+ */
+fun removeElement(nums: IntArray, `val`: Int): Int {
+    if (nums.size == 0) return 0
+    // [2,2,3,3,4] 2
+    //  s   e
+    var left = 0
+    for (i in 0..nums.size - 1) {
+        if (nums[i] != `val`) {
+            nums[left] = nums[i]
+            left++
+        }
+    }
+    return left
+}
+
+/**
+ * 33. 搜索旋转排序数组
+ * 整数数组 nums 按升序排列，数组中的值 互不相同 。时间复杂度为 O(log n)
+ * 输入：nums = [4,5,6,7,0,1,2], target = 0
+ * 输出：4
+ *
+ * 解题
+ * 二分查找法
+ * 如果在一边是有序，目标在有序就直接在有序中查找，找不，设置边界，是一种类似排除法
+ */
+fun search(nums: IntArray, target: Int): Int {
+    var left = 0
+    var right = nums.size - 1
+    while (left <= right) {
+        val mid = left + (right - left) / 2
+        val v = nums[mid]
+        if (v == target) {
+            return mid
+        }
+        if (nums[mid] >= nums[left]) {
+            if (target >= nums[left] && target < nums[mid]) {
+                right = mid - 1
+            } else {
+                left = mid + 1
+            }
+        } else {
+            if (target > nums[mid] && target <= nums[right]) {
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+    }
+    return -1
+}
+
+/**
+ * 31. 下一个排列
+ */
+fun nextPermutation(nums: IntArray): Unit {
+
+}
+
+/**
+ * 39. 组合总和
+ * 给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，
+ * 找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合
+ * 输入：candidates = [2,3,6,7], target = 7
+ * 输出：[[2,2,3],[7]]
+ *
+ * 解释
+ *
+ */
+
+
+/**
  * 给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率前 k 高的元素。你可以按 任意顺序 返回答案。
  * 输入：nums = [1,1,1,2,2,3], k = 2
  * 输出：[1,2]
@@ -173,6 +291,8 @@ fun topKFrequent(nums: IntArray, k: Int): IntArray {
  * 解题
  * 1、把数字加入set中，过滤掉重复的
  * 2、遍历set，在set中查询下一个是否存在
+ * 3、如果 当前值 的前一个存在（nums[i]-1) 则不是头 否则是头
+ * 4、优化点：如果找了一条长度大于 set 的一半 那就不可能还有另一条大于一半的 直接返回
  */
 fun longestConsecutive(nums: IntArray): Int {
     val set = mutableSetOf<Int>()
@@ -199,6 +319,216 @@ fun longestConsecutive(nums: IntArray): Int {
         if (count * 2 >= set.size) return count
     }
     return count
+}
+
+/////////////////////////////////////////////
+// 双指针
+/////////////////////////////////////////////
+
+/**
+ * 75. 颜色分类
+ * 输入：nums = [2,0,2,1,1,0]
+ * 输出：[0,0,1,1,2,2]
+ *
+ * 解题
+ * 前后两个指针，当后面指针交换后，游标指针不要动，还得再次检查一下交换过来的是否正确
+ */
+fun sortColors(nums: IntArray): Unit {
+    var p0 = 0
+    var p2 = nums.size - 1
+    var i = 0
+    while (i <= p2) {
+        if (nums[i] == 0) {
+            swap(nums, i, p0)
+            p0++
+            i++
+        } else if (nums[i] == 2) {
+            swap(nums, i, p2)
+            p2--
+        } else {
+            i++
+        }
+    }
+}
+
+fun swap(nums: IntArray, i: Int, j: Int) {
+    val temp = nums[i]
+    nums[i] = nums[j]
+    nums[j] = temp
+}
+
+/**
+ * 845. 数组中的最长山脉
+ * 给出一个整数数组 arr，返回最长山脉子数组的长度。如果不存在山脉子数组，返回 0
+ * 输入：arr = [2,1,4,7,3,2,5]
+ * 输出：5
+ * 解释：最长的山脉子数组是 [1,4,7,3,2]，长度为 5。
+ *
+ * 解题
+ * 局部最小：[0]<[1] 或者 [i-1]>[i]<[i+1] 或者 [n-2]>[n-1]
+ * 用二分找 中间 比 左变小 在这里找
+ * 找到山峰后，向两边找到谷底
+ */
+fun longestMountain(arr: IntArray): Int {
+    var max = 0
+    for (i in 1..arr.size - 2) {
+        // 山峰
+        if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) {
+            var r = i
+            var l = i
+            while (l > 0 && arr[l] > arr[l - 1]) l--
+            while (r < arr.size - 1 && arr[r] > arr[r + 1]) r++
+            max = maxOf(max, r - l + 1)
+        }
+    }
+    return max
+}
+
+
+/////////////////////////////////////////////
+// 滑动窗口
+/////////////////////////////////////////////
+/**
+ * 53. 最大子数组和
+ * 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+ * 输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
+ * 输出：6
+ * 解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
+ *
+ */
+//fun maxSubArray(nums: IntArray): Int {
+//
+//}
+
+
+/**
+ * 643. 子数组最大平均数 I
+ * 给你一个由 n 个元素组成的整数数组 nums 和一个整数 k
+ * 请你找出平均数最大且 长度为 k 的连续子数组，并输出该最大平均数。
+ * 输入：nums = [1,12,-5,-6,50,3], k = 4
+ * 输出：12.75
+ * 解释：最大平均数 (12-5-6+50)/4 = 51/4 = 12.75
+ */
+fun findMaxAverage(nums: IntArray, k: Int): Double {
+    var sum = 0
+    for (i in 0..k - 1) {
+        sum += nums[i]
+    }
+    var max = sum
+    for (end in k..nums.size - 1) {
+        sum += nums[end] - nums[end - k]
+        max = maxOf(sum, max)
+    }
+    return max.toDouble() / k
+}
+
+/////////////////////////////////////////////
+// 前缀和   x-y的和 Array[y] - Array[x-1]
+/////////////////////////////////////////////
+/**
+ * 560. 和为 K 的子数组
+ * 给定一个整数数组和一个整数 k ，请找到该数组中和为 k 的连续子数组的个数。
+ * 输入:nums = [1,1,1], k = 2
+ * 输出: 2
+ * 解释: 此题 [1,1] 与 [1,1] 为两种不同的情况
+ */
+fun subarraySum(nums: IntArray, k: Int): Int {
+    val map = hashMapOf<Int, Int>()
+    map[0] = 1
+
+    var sum = 0
+    var count = 0
+
+    for (i in nums) {
+        sum += i
+        val target = sum - k
+        count += map.get(target) ?: 0
+        map.put(sum, (map.get(sum) ?: 0) + 1)
+    }
+    return count
+}
+
+
+/////////////////////////////////////////////
+// 前缀和   x-y的和 Array[y] - Array[x-1]
+/////////////////////////////////////////////
+/**
+ * 给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
+ * 输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+ * 输出：[1,2,3,6,9,8,7,4,5]
+ *
+ * 解题
+ * 按顺序逐层递减，但要注意，最后两个增加边界判断 top <= bottom 和  left <= right
+ */
+fun spiralOrder(matrix: Array<IntArray>): List<Int> {
+    // 1,2,3
+    // 4,5,6
+    // 7,8,9
+    var top = 0
+    var left = 0
+    var right = matrix[0].size - 1
+    var bottom = matrix.size - 1
+    val list = mutableListOf<Int>()
+
+    while (top <= bottom && left <= right) {
+        for (i in left..right) {
+            list += matrix[top][i]
+        }
+
+        top++
+
+        for (i in top..bottom) {
+            list += matrix[i][right]
+        }
+        right--
+
+        if (top <= bottom) {
+            for (i in right downTo left) {
+                list += matrix[bottom][i]
+            }
+        }
+        bottom--
+        if (left <= right) {
+            for (i in bottom downTo top) {
+                list += matrix[i][left]
+            }
+        }
+        left++
+    }
+    return list
+}
+
+/**
+ * 209. 长度最小的子数组
+ * 找出该数组中满足其总和大于等于 target 的长度最小的 子数组
+ * 输入：target = 7, nums = [2,3,1,2,4,3]
+ * 输出：2
+ * 解释：子数组 [4,3] 是该条件下的长度最小的子数组。
+ *
+ * 解题
+ * 1、快慢指针，尾指针向前移动，大于了，结算长度，让开始指针移动
+ * 2、和是累加的，当尾指针向前，就把数加进去，尾向前就把数据减出去，总是维持窗口内的一个总大小
+ */
+fun minSubArrayLen(target: Int, nums: IntArray): Int {
+    if (nums.size == 0) return 0
+    if (nums.size == 1 && nums[0] >= target) 1 else 0
+
+    var start = 0
+    var end = 0
+    var count = Int.MAX_VALUE
+
+    var sum = 0
+    while (end < nums.size) {
+        // 2,3,1,2,4,3
+        sum += nums[end]
+        while (sum >= target) {
+            count = minOf(count, end - start + 1)
+            sum -= nums[start]
+            start++
+        }
+        end++
+    }
+    return if (count == Int.MAX_VALUE) 0 else count
 }
 
 /**
@@ -301,9 +631,9 @@ fun removeDuplicates(nums: IntArray): Int {
  *
  *解题
  */
-fun singleNumber(nums: IntArray): Int {
-
-}
+//fun singleNumber(nums: IntArray): Int {
+//
+//}
 
 
 ///**
