@@ -8,6 +8,7 @@ import java.util.PriorityQueue
 /**
  * 链表：
  * 前一个和后一个组成一对键值表，和HashMap配合 和优先队列配合排序
+ * 链表的中点，快慢指针
  */
 fun main(args: Array<String>) {
 }
