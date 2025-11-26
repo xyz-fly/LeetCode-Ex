@@ -218,6 +218,83 @@ fun hasPathSum(root: TreeNode?, targetSum: Int): Boolean {
             || hasPathSum(root.right, targetSum - root.`val`)
 }
 
+
+/**
+ * 给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+ * 输入：root = [1,2,3,null,5,null,4]
+ * 输出：[1,3,4]
+ *
+ * 解题
+ * 1、层序遍历
+ * 2、改变前序遍历  先放入右节点
+ */
+fun rightSideView(root: TreeNode?): List<Int> {
+    val list = mutableListOf<Int>()
+    if (root == null) return list
+
+    val queue = LinkedList<TreeNode>()
+    queue.offer(root)
+    while (queue.size > 0) {
+        val size = queue.size
+        for (i in 0..size - 1) {
+            val t = queue.poll()
+            if (i == size - 1) {
+                list.add(t.`val`)
+            }
+            if (t.left != null) {
+                queue.offer(t.left)
+            }
+            if (t.right != null) {
+                queue.offer(t.right)
+            }
+        }
+    }
+    return list
+}
+
+fun rightSideView2(root: TreeNode?): List<Int> {
+    val list = mutableListOf<Int>()
+    if (root == null) return list
+    aa(root, list, 0)
+    return list
+}
+
+fun aa(root: TreeNode?, list: MutableList<Int>, depth: Int) {
+    if (root == null) return
+    if (depth == list.size) {
+        list.add(root.`val`)
+    }
+    aa(root.right, list, depth + 1)
+    aa(root.left, list, depth + 1)
+}
+
+
+/**
+ * 给定一棵二叉树的根节点 root ，请找出该二叉树中每一层的最大值。
+ * 输入: root = [1,3,2,5,3,null,9]
+ * 输出: [1,3,9]
+ *
+ * DFS的话，list的size等于depth时，说明当前没有该元素，要添加一个
+ */
+fun largestValues(root: TreeNode?): List<Int> {
+    val list = mutableListOf<Int>()
+    if (root == null) return list
+
+    a(root, list, 0)
+    return list
+}
+
+fun a(root: TreeNode?, list: MutableList<Int>, d: Int) {
+    if (root == null) return
+    if (list.size == d) {
+        list.add(root.`val`)
+    } else {
+        list.set(d, maxOf(root.`val`, list.get(d)))
+    }
+    a(root.left, list, d + 1)
+    a(root.right, list, d + 1)
+}
+
 fun isValidBST2(root: TreeNode?): Info? {
     if (root == null) return null
 
