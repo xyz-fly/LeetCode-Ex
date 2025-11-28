@@ -1,16 +1,33 @@
 package com.example.leetcode_ex
 
+import kotlin.math.min
+
 /**
  * 滑动窗口 （连续）
  * 1、定滑窗口套路：
  * 入：加入窗口，更新统计量，一般是for循环的i，前面先加满K，后面从K开始遍历
  * 更新：更新答案，最大最小值
  * 出：start - k + 1 更新相关统计量，一般是 k-i
+ * 模版
+ *   for (start in 0..nums.size - 1) {
+ *         sum += nums[start] //  相当于前进
+ *         val end = start - k + 1
+ *         if (end < 0) {
+ *             continue
+ *         }
+ *         avg = maxOf(sum, avg)
+ *         sum -= nums[end]  // 出去的要排除掉
+ *     }
  *
+ * 2、不定长滑动窗口
+ * 解决：最长子数组，最短子数组，子数组个数
+ * 维护一个队列，右指针入队，左指针出队
  *
+ * 3、前后双指针
+ * 解决，数组有序，前后各有一个指针向中间移动
  */
 fun main(args: Array<String>) {
-    getAverages(intArrayOf(7, 4, 3, 9, 1, 8, 5, 2, 6), 3)
+    lengthOfLongestSubstring("abcabcbb")
 }
 
 /**
@@ -127,8 +144,74 @@ fun getAverages(nums: IntArray, k: Int): IntArray {
 
         if (i >= k * 2) {
             array[i - k] = sum / (k * 2 + 1)
-            sum -= nums[i - k * 2 ]
+            sum -= nums[i - k * 2]
         }
     }
     return array
+}
+
+/**
+ * 拆炸弹
+ * 如果 k > 0 ，将第 i 个数字用 接下来 k 个数字之和替换。
+ * 如果 k < 0 ，将第 i 个数字用 之前 k 个数字之和替换。
+ * 如果 k == 0 ，将第 i 个数字用 0 替换。
+ * 输入：code = [5,7,1,4], k = 3
+ * 输出：[12,10,16,13]
+ *  [7+1+4, 1+4+5, 4+5+7, 5+7+1]
+ * 输入：code = [2,4,9,3], k = -2
+ * 输出：[12,5,6,13]
+ * [3+9, 2+3, 4+2, 9+4]
+ */
+fun decrypt(code: IntArray, k: Int): IntArray {
+    val result = IntArray(code.size)
+
+    var r = if (k > 0) k + 1 else code.size
+    val k = Math.abs(k)
+
+    var sum = 0
+    for (i in r - k..r - 1) {
+        sum += code[i]
+    }
+
+    for (i in 0..code.size - 1) {
+        result[i] = sum
+        sum += code[r % code.size] - code[(r - k) % code.size]
+        r++
+    }
+    return result
+}
+
+/**
+ * 子串出现次数
+ * 子串中不同字母的数目必须小于等于 maxLetters 。
+ * 子串的长度必须大于等于 minSize 且小于等于 maxSize 。
+ * 输入：s = "aababcaab", maxLetters = 2, minSize = 3, maxSize = 4
+ * 输出：2
+ * 解释：子串 "aab" 在原字符串中出现了 2 次。
+ * 它满足所有的要求：2 个不同的字母，长度为 3 （在 minSize 和 maxSize 范围内）。
+ *
+ */
+//fun maxFreq(s: String, maxLetters: Int, minSize: Int, maxSize: Int): Int {
+//}
+
+/**
+ * 给定一个字符串 s ，请你找出其中不含有重复字符的 最长 子串 的长度。
+ *
+ */
+fun lengthOfLongestSubstring(s: String): Int {
+    val chars = s.toCharArray()
+    val check = IntArray(128)
+    var end = 0
+    var max = 0
+    for (start in 0..chars.size - 1) {
+        val c = chars[start]
+        println("c = " + c + " " + c.code)
+        check[c.code]++
+        while (check[c.code] > 1) {
+            check[chars[end].code]--
+            end++
+        }
+        max = maxOf(max, start - end + 1)
+    }
+    return max
 }
