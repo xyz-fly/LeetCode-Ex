@@ -415,8 +415,8 @@ fun findMaxAverage(nums: IntArray, k: Int): Double {
         sum += nums[i]
     }
     var max = sum
-    for (end in k..nums.size - 1) {
-        sum += nums[end] - nums[end - k]
+    for (i in k..nums.size - 1) {
+        sum += nums[i] - nums[i - k]
         max = maxOf(sum, max)
     }
     return max.toDouble() / k

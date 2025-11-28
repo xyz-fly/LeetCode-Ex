@@ -1,6 +1,7 @@
 package com.example.leetcode_ex
 
 import java.util.LinkedList
+import java.util.PriorityQueue
 
 /**
  * 二叉树
@@ -50,16 +51,22 @@ class TreeNode(var `val`: Int) {
 }
 
 fun main(args: Array<String>) {
-    val t = TreeNode(1)
-    t.left = TreeNode(2)
+    val t = TreeNode(5)
+    t.left = TreeNode(8)
         .apply {
-            left = TreeNode(4)
+            left = TreeNode(2)
+                .apply {
+                    left = TreeNode(4)
+                    right = TreeNode(6)
+                }
+            right = TreeNode(1)
         }
-    t.right = TreeNode(3)
+    t.right = TreeNode(9)
         .apply {
-            right = TreeNode(5)
+            left = TreeNode(3)
+            right = TreeNode(7)
         }
-    zigzagLevelOrder(t)
+    kthLargestLevelSum(t, 2)
 }
 
 
@@ -293,6 +300,102 @@ fun a(root: TreeNode?, list: MutableList<Int>, d: Int) {
     }
     a(root.left, list, d + 1)
     a(root.right, list, d + 1)
+}
+
+/**
+ * 给你一棵二叉树的根节点，返回该树的 直径 。
+ * 二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root
+ * 输入：root = [1,2,3,4,5]
+ * 输出：3
+ * 解释：3 ，取路径 [4,2,1,3] 或 [5,2,1,3] 的长度。
+ *
+ * 解题
+ * 获取深度以及最大值信息
+ */
+fun diameterOfBinaryTree(root: TreeNode?): Int {
+    return a(root).max
+}
+
+fun a(root: TreeNode?): AA {
+    if (root == null) return AA(0, 0)
+    val l = a(root.left)
+    val r = a(root.right)
+    val max = maxOf(l.d + r.d + 1, maxOf(l.max, r.max))
+    return AA(maxOf(l.d, r.d) + 1, max)
+}
+
+class AA(
+    val d: Int,
+    val max: Int
+)
+
+/**
+ * 给你一棵二叉树的根节点 root 和一个正整数 k 。
+ * 树中的 层和 是指 同一层 上节点值的总和。
+ *
+ * 解题
+ * BFS + 小根堆
+ */
+fun kthLargestLevelSum(root: TreeNode?, k: Int): Long {
+    if (root == null) return -1
+    val dui = PriorityQueue<Long>(k) { a, b -> (b - a).toInt() }
+
+    val queue = LinkedList<TreeNode>()
+    queue.offer(root)
+    var level = 0
+    while (queue.isNotEmpty()) {
+        val size = queue.size
+        var sum = 0L
+        for (i in 0..size - 1) {
+            val n = queue.poll()
+            if (level > 37)
+                println(sum)
+            sum += n.`val`.toLong()
+            if (n.left != null) {
+                queue.offer(n.left)
+            }
+            if (n.right != null) {
+                queue.offer(n.right)
+            }
+        }
+        dui.offer(sum)
+        println(dui.size)
+        level++
+    }
+
+    if (level < k) {
+        return -1
+    } else {
+        var i = 0
+        var aa = 0L
+        while (i < k) {
+            aa = dui.poll()
+            i++
+        }
+        println(aa)
+        return aa
+    }
+}
+
+/**
+ * 给你一棵以 root 为根的二叉树和一个整数 target ，请你删除所有值为 target 的 叶子节点 。
+ * 输入：root = [1,2,3,2,null,2,4], target = 2
+ * 输出：[1,null,3,null,4]
+ *
+ * 解题
+ * 只能后续遍历，左右中的顺序
+ */
+fun removeLeafNodes(root: TreeNode?, target: Int): TreeNode? {
+    if (root == null) return null
+
+    val l = removeLeafNodes(root.left, target)
+    val r = removeLeafNodes(root.right, target)
+    root.left = l
+    root.right = r
+    if (root.left == null && root.right == null && root.`val` == target) {
+        return null
+    }
+    return root
 }
 
 fun isValidBST2(root: TreeNode?): Info? {
