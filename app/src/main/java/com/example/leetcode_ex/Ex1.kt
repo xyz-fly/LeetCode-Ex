@@ -150,6 +150,11 @@ fun fourSum(nums: IntArray, target: Int): List<List<Int>> {
  * 输入：strs = ["flower","flow","flight"]
  * 输出："fl"
  *
+ * 解题
+ * 1、默认第一个为目标
+ * 2、取下一个，比较与目标谁更长，作为遍历的长度
+ * 3、两个开始比较string，获得最后相等的位置
+ * 4、截取字符串，作为新的目标
  */
 fun longestCommonPrefix(strs: Array<String>): String {
     if (strs.size == 0) return ""
@@ -179,7 +184,10 @@ fun longestCommonPrefix(strs: Array<String>): String {
  * 输出：5, nums = [0,1,4,0,3,_,_,_]
  *
  * 解题
- * 慢指针的含义是该位置不能是目标，快指针走的时候，遇到不是目标就将结果赋值给慢指针的位置
+ * 1、顺序可变，意味着可交换
+ * 2、慢指针的含义是：该位置不能是目标，快指针走的时候，遇到不是目标就将结果赋值给慢指针的位置
+ * 3、慢指针记录不与其相等的位置，快指针就是遍历的i
+ * 4、移动了多少步，就是不相同的数量
  */
 fun removeElement(nums: IntArray, `val`: Int): Int {
     if (nums.size == 0) return 0
@@ -201,9 +209,15 @@ fun removeElement(nums: IntArray, `val`: Int): Int {
  * 输入：nums = [4,5,6,7,0,1,2], target = 0
  * 输出：4
  *
+ * 思路：
+ * 1、数组分成有序的两段，前一段每个数组一定大于后一段每个数组
+ * 2、如果其中一个数字与最后一个比较，如果大于最后一个数字，一定落在第一段内，否则落在第二段内
+ *
  * 解题
- * 二分查找法
+ * 二分查找法 要求时间复杂度logN，必然二分查找法
  * 如果在一边是有序，目标在有序就直接在有序中查找，找不，设置边界，是一种类似排除法
+ * 1、取中间位置，如果相等，直接结束
+ * 2、如果当前值比左边大，看目标值是否落在这个区间里，如果在，缩小升序空间
  */
 fun search(nums: IntArray, target: Int): Int {
     var left = 0
@@ -214,6 +228,8 @@ fun search(nums: IntArray, target: Int): Int {
         if (v == target) {
             return mid
         }
+        // 4 5 6 7 8 9 1 2 3
+        // 6 7 8 0 1 2 3 4 5
         if (nums[mid] >= nums[left]) {
             if (target >= nums[left] && target < nums[mid]) {
                 right = mid - 1
