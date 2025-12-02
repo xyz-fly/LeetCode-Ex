@@ -1,16 +1,34 @@
 package com.example.leetcode_ex
 
-import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
-import java.util.PriorityQueue
-
 /**
  * 链表：
  * 前一个和后一个组成一对键值表，和HashMap配合 和优先队列配合排序
  * 链表的中点，快慢指针
+ *
+ * 遍历size模版：
+ *     var temp = head
+ *     var count = 0
+ *     while (temp != null) {
+ *         temp = temp.next
+ *         count++
+ *     }
  */
 fun main(args: Array<String>) {
+//    middleNode(ListNode(1).apply {
+//        next = ListNode(2).apply {
+//            next = ListNode(3).apply {
+//                next = ListNode(4).apply {
+//                    next = ListNode(5)
+//                }
+//            }
+//        }
+//    })
+
+    val a = LRUCache(3)
+    a.put(1, 1)
+    a.put(2, 2)
+    a.put(3, 3)
+    a.put(4, 4)
 }
 
 /**
@@ -121,34 +139,32 @@ fun mergeTwoLists(list1: ListNode?, list2: ListNode?): ListNode? {
  *
  * 1、二分法，两个两个合并，利用递归返回
  */
-@RequiresApi(Build.VERSION_CODES.N)
-fun mergeKLists(lists: Array<ListNode?>): ListNode? {
-    if (lists == null) return null
-    if (lists.size == 1) return lists.get(0)
-
-
-    val head = ListNode(0)
-    var temp = head
-    val p = PriorityQueue<ListNode> { a, b -> a.`val` - b.`val` }
-
-    for (i in 0..lists.size - 1) {
-        if (lists[i] != null) {
-            p.add(lists[i])
-        }
-    }
-
-
-    while (p.size > 0) {
-        val n = p.poll()
-        if (n.next != null) {
-            p.add(n.next)
-        }
-        temp.next = n
-        temp = temp.next!!
-    }
-
-    return head.next
-}
+//fun mergeKLists(lists: Array<ListNode?>): ListNode? {
+//    if (lists == null) return null
+//    if (lists.size == 1) return lists.get(0)
+//
+//    val head = ListNode(0)
+//    var temp = head
+//    val p = PriorityQueue<ListNode> { a, b -> a.`val` - b.`val` }
+//
+//    for (i in 0..lists.size - 1) {
+//        if (lists[i] != null) {
+//            p.add(lists[i])
+//        }
+//    }
+//
+//
+//    while (p.size > 0) {
+//        val n = p.poll()
+//        if (n.next != null) {
+//            p.add(n.next)
+//        }
+//        temp.next = n
+//        temp = temp.next!!
+//    }
+//
+//    return head.next
+//}
 
 /**
  * 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点
@@ -343,6 +359,146 @@ fun mergeNodes(head: ListNode?): ListNode? {
 }
 
 /**
+ * 876
+ * 给你单链表的头结点 head ，请你找出并返回链表的中间结点。
+ * 如果有两个中间结点，则返回第二个中间结点。
+ * 输入：head = [1,2,3,4,5,6]
+ * 输出：[4,5,6]
+ * 解释：该链表有两个中间结点，值分别为 3 和 4 ，返回第二个结点。
+ *
+ */
+fun middleNode(head: ListNode?): ListNode? {
+    if (head == null) return null
+
+    var temp = head
+    var count = 0
+    while (temp != null) {
+        temp = temp.next
+        count++
+    }
+    println(count)
+
+    var result = head
+    for (i in 0..count / 2) {
+        result = result?.next
+    }
+    return result
+}
+
+fun reverseList(head: ListNode?): ListNode? {
+    var cur = head
+    var pre: ListNode? = null
+    while (cur != null) {
+        val next = cur.next
+        cur.next = pre
+        pre = cur
+        cur = next
+    }
+    return pre
+}
+
+/**
+ * 给你一个整数数组 nums 和一个链表的头节点 head。从链表中移除所有存在于 nums 中的节点后，返回修改后的链表的头节点。
+ * 输入： nums = [1,2,3], head = [1,2,3,4,5]
+ * 输出： [4,5]
+ */
+fun modifiedList(nums: IntArray, head: ListNode?): ListNode? {
+    val set = mutableSetOf<Int>()
+    for (i in nums) {
+        set += i
+    }
+    var temp: ListNode? = ListNode(0)
+    val result = temp
+    temp?.next = head
+
+    while (temp?.next != null) {
+        val n = temp.next!!
+        if (set.contains(n.`val`)) {
+            temp.next = n.next
+        } else {
+            temp = temp.next
+        }
+    }
+    return result?.next
+}
+
+/**
+ * 203
+ * 给你一个链表的头节点 head 和一个整数 val ，请你删除链表中所有满足 Node.val == val 的节点，并返回 新的头节点 。
+ * 输入：head = [1,2,6,3,4,5,6], val = 6
+ * 输出：[1,2,3,4,5]
+ */
+fun removeElements(head: ListNode?, `val`: Int): ListNode? {
+    var temp: ListNode? = ListNode(0)
+    val result = temp
+    temp?.next = head
+
+    while (temp!!.next != null) {
+        val n = temp.next!!
+        if (n.`val` == `val`) {
+            temp.next = n.next
+        } else {
+            temp = temp.next
+        }
+    }
+    return result
+}
+
+/**
+ * 234
+ * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返回 true ；否则，返回 false 。
+ * 输入：head = [1,2,2,1]
+ * 输出：true
+ */
+fun isPalindrome(head: ListNode?): Boolean {
+    if (head == null || head.next == null) return true
+    var cur: ListNode? = head
+
+    var pre: ListNode? = null
+    var tail: ListNode? = null
+
+    while (cur != null) {
+        tail = ListNode(cur.`val`)
+        tail.next = pre
+        pre = tail
+        cur = cur.next
+    }
+
+    cur = head
+    while (cur != null) {
+        val n1 = cur.`val`
+        val n2 = tail!!.`val`
+        if (n1 != n2) {
+            return false
+        }
+        cur = cur.next
+        tail = tail.next
+    }
+    return true
+}
+
+/**
+ * 725
+ * 输入：head = [1,2,3], k = 5
+ * 输出：[[1],[2],[3],[],[]]
+ * 解释：
+ * 第一个元素 output[0] 为 output[0].val = 1 ，output[0].next = null 。
+ * 最后一个元素 output[4] 为 null ，但它作为 ListNode 的字符串表示是 [] 。
+ */
+fun splitListToParts(head: ListNode?, k: Int): Array<ListNode?> {
+    var size = 0
+    var temp = head
+    while (temp != null) {
+        temp = temp.next
+        size++
+    }
+
+    val avg = size / k
+    val array = Array<ListNode?>(k) { null }
+    return array
+}
+
+/**
  * 插入排序，先查找，然后从头开始遍历找到位置 o(n2)
  * 输入: head = [4,2,1,3]
  * 输出: [1,2,3,4]
@@ -369,53 +525,64 @@ fun mergeNodes(head: ListNode?): ListNode? {
  * 双端链表 配合 hashmap
  *
  */
+class Node(val key: Int, var v: Int) {
+    var prev: Node? = null
+    var next: Node? = null
+}
+
 class LRUCache(val capacity: Int) {
     val map = mutableMapOf<Int, Node>()
 
-    class Node(val v: Int) {
-        var n: Node? = null
-    }
+    private val dummy = Node(0, 0)
 
-    var start: Node? = null
-    var end: Node? = null
-    var count = 0
+    init {
+        dummy.prev = dummy
+        dummy.next = dummy
+    }
 
     fun get(key: Int): Int {
-        var n = map.get(key)
-
-        if (n != null) {
-            val temp = n.n
-
-
-
-
-            return n.v
-        } else {
-            return -1
-        }
+        val node = getNode(key)
+        return node?.v ?: -1
     }
+
 
     fun put(key: Int, value: Int) {
-        // 1 2 3 4
-        // s     e
-        val n = Node(value)
-        if (count < capacity) {
-            count++
-            if (start == null) {
-                start = n
-            }
-            if (end == null) {
-                end = n
-            } else {
-                end!!.n = n
-                end = end!!.n
-            }
-        } else {
-            start = start!!.n
-            end!!.n = n
-            end = end!!.n
+        var node = getNode(key)
+        if (node != null) {
+            node.v = value
+            return
         }
-        map.put(key, n)
+
+        node = Node(key, value)
+        map.put(key, node)
+        pushFront(node)
+        if (map.size > capacity) {
+            val backNode = dummy.prev
+            map.remove(backNode!!.key)
+            remove(backNode)
+        }
     }
 
+    private fun getNode(key: Int): Node? {
+        if (!map.containsKey(key)) {
+            return null
+        }
+
+        val node = map.get(key)!!
+        remove(node)
+        pushFront(node)
+        return node
+    }
+
+    private fun remove(n: Node) {
+        n.prev?.next = n.next
+        n.next?.prev = n.prev
+    }
+
+    private fun pushFront(n: Node) {
+        n.prev = dummy
+        n.next = dummy.next
+        n.prev?.next = n
+        n.next?.prev = n
+    }
 }
