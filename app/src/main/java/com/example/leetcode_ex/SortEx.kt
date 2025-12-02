@@ -6,6 +6,7 @@ fun main(args: Array<String>) {
     printArray { select(it) }
     printArray { insert(it) }
     printArray { mergeSort(it) }
+    printArray { quickSort(it) }
 }
 
 fun printArray(func: (IntArray) -> Unit) {
@@ -13,6 +14,31 @@ fun printArray(func: (IntArray) -> Unit) {
     func(array)
     array.forEach { print("$it,") }
     println()
+}
+
+fun quickSort(array: IntArray) {
+    quickSplit(array, 0, array.size - 1)
+}
+
+fun quickSplit(array: IntArray, start: Int, end: Int) {
+    if (start >= end) return
+    val pivot = pivot(array, start, end)
+    quickSplit(array, start, pivot - 1)
+    quickSplit(array, pivot + 1, end)
+}
+
+fun pivot(array: IntArray, start: Int, end: Int): Int {
+    val pivot = array[start]
+    var p = start
+    for (i in start + 1..end) {
+        if (array[i] < pivot) {
+            p++
+            arraySwap(array, i, p)
+        }
+    }
+    array[start] = array[p]
+    array[p] = pivot
+    return p
 }
 
 fun mergeSort(array: IntArray) {
